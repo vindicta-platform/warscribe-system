@@ -1,0 +1,44 @@
+site_name: WARScribe System
+site_description: Notation, Parsing, and Transcripts for the Vindicta Platform.
+site_author: Vindicta Platform Contributors
+site_url: https://vindicta-platform.github.io/warscribe-system/
+
+repo_name: vindicta-platform/warscribe-system
+repo_url: https://github.com/vindicta-platform/warscribe-system
+
+theme:
+  name: material
+  palette:
+    - scheme: slate
+      primary: blue
+      accent: light blue
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+    - scheme: default
+      primary: blue
+      accent: light blue
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+  font:
+    text: Outfit
+    code: JetBrains Mono
+
+nav:
+  - Home: index.md
+
+markdown_extensions:
+  - admonition
+  - codehilite
+  - toc:
+      permalink: true
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.details
+  - attr_list
+  - md_in_html
+
+plugins:
+  - search
