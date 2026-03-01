@@ -2,6 +2,7 @@
 Warscribe Worker — RQ task functions for the processing pipeline.
 Each task completes one phase and enqueues the next.
 """
+
 import os
 import sys
 
@@ -20,6 +21,7 @@ from warscribe_llm import WarscribeLLM
 REDIS_URL = os.environ.get("REDIS_URL", "redis://localhost:6379")
 DB_PATH = os.environ.get("DB_PATH", "warscribe.db")
 INPUT_DIR = os.environ.get("INPUT_DIR", "input")
+
 
 def _get_queue():
     conn = Redis.from_url(REDIS_URL)
@@ -74,7 +76,9 @@ def task_transcribe(video_id: str):
         q.enqueue(task_llm_embed, video_id, job_timeout="6h")
         print(f"[WORKER] Enqueued LLM+embed for {video_id}")
     else:
-        print(f"[WORKER] Transcription ended with status '{job_status}', not enqueuing LLM")
+        print(
+            f"[WORKER] Transcription ended with status '{job_status}', not enqueuing LLM"
+        )
 
     return video_id
 
