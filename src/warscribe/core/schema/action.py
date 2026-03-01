@@ -10,7 +10,7 @@ Core action types per ROADMAP v0.1.0:
 
 from datetime import datetime
 from enum import Enum
-from typing import Optional, Union, List
+from typing import Optional, Union
 from uuid import UUID
 
 from pydantic import BaseModel, Field
@@ -54,7 +54,7 @@ class BaseAction(VindictaModel):
     # Timing
     turn: int = Field(..., ge=1, description="Turn number")
     phase: str = Field(..., description="Game phase (e.g., 'movement', 'shooting')")
-    # timestamp inherited from VindictaModel (created_at) or specific game time? 
+    # timestamp inherited from VindictaModel (created_at) or specific game time?
     # VindictaModel has created_at, but actions might have a specific in-game timestamp.
     # We'll keep a specific timestamp field if it represents game time, or map it.
     # WARScribe usually implies "when it happened in real time" which created_at covers.
@@ -77,8 +77,8 @@ class BaseAction(VindictaModel):
 
 class RelativeDistance(BaseModel):
     """Distance change relative to another unit.
-    
-    Sub-component, not a standalone entity, so BaseModel is fine, 
+
+    Sub-component, not a standalone entity, so BaseModel is fine,
     but VindictaModel gives consistent config. Let's stick to BaseModel for lightweight struct.
     """
 

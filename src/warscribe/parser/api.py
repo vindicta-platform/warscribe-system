@@ -1,6 +1,7 @@
 """
 Warscribe API — FastAPI gateway for job submission, status, and RAG queries.
 """
+
 import os
 import sys
 
@@ -32,12 +33,15 @@ def _get_db():
 
 # ── Request / Response Models ──────────────────────────────
 
+
 class JobRequest(BaseModel):
     url: str
+
 
 class QueryRequest(BaseModel):
     question: str
     video_id: Optional[str] = None
+
 
 class IngestRequest(BaseModel):
     file_path: str
@@ -45,6 +49,7 @@ class IngestRequest(BaseModel):
 
 
 # ── Job Endpoints ──────────────────────────────────────────
+
 
 @app.post("/jobs", status_code=201)
 def submit_job(req: JobRequest):
@@ -75,6 +80,7 @@ def get_job(video_id: str):
 
 # ── RAG Query Endpoints ───────────────────────────────────
 
+
 @app.post("/query")
 def rag_query(req: QueryRequest):
     """Query the RAG system with a natural language question."""
@@ -85,6 +91,7 @@ def rag_query(req: QueryRequest):
 
 # ── Ingestion Endpoint ────────────────────────────────────
 
+
 @app.post("/ingest")
 def ingest_file(req: IngestRequest):
     """Ingest a text file from the input volume into ChromaDB."""
@@ -92,12 +99,14 @@ def ingest_file(req: IngestRequest):
         raise HTTPException(status_code=404, detail=f"File not found: {req.file_path}")
 
     from ingest_text import ingest_text_file
+
     source_id = req.source_id or os.path.basename(req.file_path)
     count = ingest_text_file(req.file_path, source_id=source_id, db_path=DB_PATH)
     return {"message": f"Ingested {count} chunks", "source_id": source_id}
 
 
 # ── Health ─────────────────────────────────────────────────
+
 
 @app.get("/health")
 def health():

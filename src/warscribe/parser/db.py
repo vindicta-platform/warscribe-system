@@ -11,8 +11,14 @@ class Database:
         chroma_dir = chroma_path or os.environ.get("CHROMA_PATH", "warscribe_chroma")
         try:
             self.chroma_client = chromadb.PersistentClient(path=chroma_dir)
-            self.embedding_fn = embedding_functions.SentenceTransformerEmbeddingFunction(model_name="all-MiniLM-L6-v2")
-            self.collection = self.chroma_client.get_or_create_collection(name="transcripts", embedding_function=self.embedding_fn)
+            self.embedding_fn = (
+                embedding_functions.SentenceTransformerEmbeddingFunction(
+                    model_name="all-MiniLM-L6-v2"
+                )
+            )
+            self.collection = self.chroma_client.get_or_create_collection(
+                name="transcripts", embedding_function=self.embedding_fn
+            )
         except Exception as e:
             print(f"Warning: ChromaDB initialization failed: {e}")
             self.chroma_client = None
@@ -22,18 +28,18 @@ class Database:
         c = conn.cursor()
         # Enable WAL mode for concurrent read access
         c.execute("PRAGMA journal_mode=WAL")
-        
+
         # Jobs table: tracks the overall video processing
-        c.execute('''CREATE TABLE IF NOT EXISTS jobs (
+        c.execute("""CREATE TABLE IF NOT EXISTS jobs (
             video_id TEXT PRIMARY KEY,
             url TEXT,
             status TEXT, -- 'pending', 'downloading', 'processing', 'completed', 'failed'
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )''')
-        
+        )""")
+
         # Segments table: tracks chunks of the video
-        c.execute('''CREATE TABLE IF NOT EXISTS segments (
+        c.execute("""CREATE TABLE IF NOT EXISTS segments (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             video_id TEXT,
             segment_index INTEGER,
@@ -45,44 +51,52 @@ class Database:
             warscribe_json TEXT,
             status TEXT, -- 'created', 'transcribed', 'analyzed'
             FOREIGN KEY(video_id) REFERENCES jobs(video_id)
-        )''')
-        
-        c.execute('''CREATE TABLE IF NOT EXISTS chat_messages (
+        )""")
+
+        c.execute("""CREATE TABLE IF NOT EXISTS chat_messages (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             video_id TEXT,
             timestamp REAL,
             author TEXT,
             message TEXT,
             FOREIGN KEY(video_id) REFERENCES jobs(video_id)
-        )''')
-        
-        c.execute("CREATE INDEX IF NOT EXISTS idx_chat_timestamp ON chat_messages(video_id, timestamp)")
-        
+        )""")
+
+        c.execute(
+            "CREATE INDEX IF NOT EXISTS idx_chat_timestamp ON chat_messages(video_id, timestamp)"
+        )
+
         conn.commit()
         conn.close()
 
     def add_job(self, video_id, url):
         conn = sqlite3.connect(self.db_path)
         c = conn.cursor()
-        c.execute("INSERT OR IGNORE INTO jobs (video_id, url, status) VALUES (?, ?, ?)", 
-                  (video_id, url, 'pending'))
+        c.execute(
+            "INSERT OR IGNORE INTO jobs (video_id, url, status) VALUES (?, ?, ?)",
+            (video_id, url, "pending"),
+        )
         conn.commit()
         conn.close()
 
     def update_job_status(self, video_id, status):
         conn = sqlite3.connect(self.db_path)
         c = conn.cursor()
-        c.execute("UPDATE jobs SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE video_id = ?", 
-                  (status, video_id))
+        c.execute(
+            "UPDATE jobs SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE video_id = ?",
+            (status, video_id),
+        )
         conn.commit()
         conn.close()
 
     def add_segment(self, video_id, start_time, end_time, audio_path):
         conn = sqlite3.connect(self.db_path)
         c = conn.cursor()
-        c.execute('''INSERT INTO segments (video_id, start_time, end_time, audio_path, status)
-                     VALUES (?, ?, ?, ?, ?)''',
-                  (video_id, start_time, end_time, audio_path, 'created'))
+        c.execute(
+            """INSERT INTO segments (video_id, start_time, end_time, audio_path, status)
+                     VALUES (?, ?, ?, ?, ?)""",
+            (video_id, start_time, end_time, audio_path, "created"),
+        )
         segment_id = c.lastrowid
         conn.commit()
         conn.close()
@@ -92,7 +106,9 @@ class Database:
         conn = sqlite3.connect(self.db_path)
         conn.row_factory = sqlite3.Row
         c = conn.cursor()
-        c.execute("SELECT * FROM segments WHERE video_id = ? ORDER BY start_time", (video_id,))
+        c.execute(
+            "SELECT * FROM segments WHERE video_id = ? ORDER BY start_time", (video_id,)
+        )
         rows = c.fetchall()
         conn.close()
         return [dict(row) for row in rows]
@@ -101,17 +117,21 @@ class Database:
         """messages: list of (video_id, timestamp, author, message)"""
         conn = sqlite3.connect(self.db_path)
         c = conn.cursor()
-        c.executemany("INSERT INTO chat_messages (video_id, timestamp, author, message) VALUES (?, ?, ?, ?)", 
-                      messages)
+        c.executemany(
+            "INSERT INTO chat_messages (video_id, timestamp, author, message) VALUES (?, ?, ?, ?)",
+            messages,
+        )
         conn.commit()
         conn.close()
-    
+
     def get_chat_for_segment(self, video_id, start_time, end_time):
         conn = sqlite3.connect(self.db_path)
         conn.row_factory = sqlite3.Row
         c = conn.cursor()
-        c.execute("SELECT * FROM chat_messages WHERE video_id = ? AND timestamp >= ? AND timestamp < ? ORDER BY timestamp", 
-                  (video_id, start_time, end_time))
+        c.execute(
+            "SELECT * FROM chat_messages WHERE video_id = ? AND timestamp >= ? AND timestamp < ? ORDER BY timestamp",
+            (video_id, start_time, end_time),
+        )
         rows = c.fetchall()
         conn.close()
         return [dict(row) for row in rows]
@@ -135,16 +155,20 @@ class Database:
     def update_segment_transcript(self, segment_id, transcript):
         conn = sqlite3.connect(self.db_path)
         c = conn.cursor()
-        c.execute("UPDATE segments SET transcript = ?, status = 'transcribed' WHERE id = ?",
-                  (transcript, segment_id))
+        c.execute(
+            "UPDATE segments SET transcript = ?, status = 'transcribed' WHERE id = ?",
+            (transcript, segment_id),
+        )
         conn.commit()
         conn.close()
 
     def update_segment_warscribe(self, segment_id, warscribe_json):
         conn = sqlite3.connect(self.db_path)
         c = conn.cursor()
-        c.execute("UPDATE segments SET warscribe_json = ?, status = 'analyzed' WHERE id = ?",
-                  (warscribe_json, segment_id))
+        c.execute(
+            "UPDATE segments SET warscribe_json = ?, status = 'analyzed' WHERE id = ?",
+            (warscribe_json, segment_id),
+        )
         conn.commit()
         conn.close()
 
@@ -178,14 +202,18 @@ class Database:
     def _batch_add(self, ids, documents, metadatas, batch_size=1000):
         total = len(ids)
         for i in range(0, total, batch_size):
-            batch_ids = ids[i:i+batch_size]
-            batch_docs = documents[i:i+batch_size]
-            batch_meta = metadatas[i:i+batch_size]
+            batch_ids = ids[i : i + batch_size]
+            batch_docs = documents[i : i + batch_size]
+            batch_meta = metadatas[i : i + batch_size]
             try:
-                self.collection.add(ids=batch_ids, documents=batch_docs, metadatas=batch_meta)
-                print(f"Added batch {i//batch_size + 1}/{(total + batch_size - 1)//batch_size} ({len(batch_ids)} docs)")
+                self.collection.add(
+                    ids=batch_ids, documents=batch_docs, metadatas=batch_meta
+                )
+                print(
+                    f"Added batch {i // batch_size + 1}/{(total + batch_size - 1) // batch_size} ({len(batch_ids)} docs)"
+                )
             except Exception as e:
-                print(f"Error adding batch {i//batch_size + 1}: {e}")
+                print(f"Error adding batch {i // batch_size + 1}: {e}")
 
     def add_transcript_embeddings(self, video_id, segments):
         if not self.chroma_client:
@@ -201,17 +229,19 @@ class Database:
 
         for i, seg in enumerate(segments):
             # seg is expected to be a dict from get_segments
-            text = seg.get('transcript', '')
+            text = seg.get("transcript", "")
             if text and text.strip():
                 ids.append(f"{video_id}_{i}")
                 documents.append(text)
-                metadatas.append({
-                    "video_id": video_id, 
-                    "start": seg['start_time'], 
-                    "end": seg['end_time'],
-                    "source": "transcript"
-                })
-        
+                metadatas.append(
+                    {
+                        "video_id": video_id,
+                        "start": seg["start_time"],
+                        "end": seg["end_time"],
+                        "source": "transcript",
+                    }
+                )
+
         if documents:
             self._batch_add(ids, documents, metadatas)
             print(f"Finished adding {len(documents)} embeddings to ChromaDB.")
@@ -231,13 +261,13 @@ class Database:
             return
 
         ids = [f"{source_id}_{i}" for i in range(len(documents))]
-        
+
         # Ensure metadata has 'source'
         final_metadatas = []
         for m in metadatas:
             new_m = m.copy()
-            if 'source' not in new_m:
-                new_m['source'] = source_id
+            if "source" not in new_m:
+                new_m["source"] = source_id
             final_metadatas.append(new_m)
 
         self._batch_add(ids, documents, final_metadatas)

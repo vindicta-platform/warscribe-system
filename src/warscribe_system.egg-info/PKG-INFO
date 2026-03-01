@@ -1,7 +1,17 @@
-# WARScribe System
+Metadata-Version: 2.4
+Name: warscribe-system
+Version: 0.1.0
+Summary: Unified Scribe System: Action Notation, Parsing, and Game State Reconstruction
+Requires-Python: >=3.12
+Description-Content-Type: text/markdown
+Requires-Dist: vindicta-foundation
+Requires-Dist: pydantic>=2.0
+Provides-Extra: dev
+Requires-Dist: mypy>=1.0.0; extra == "dev"
+Requires-Dist: ruff>=0.1.0; extra == "dev"
+Requires-Dist: pytest>=8.0.0; extra == "dev"
 
-> 📢 **Notice:** This repository is a Component Submodule of the Vindicta Platform Monorepo. For local development, testing, and dependency resolution, please clone the root [vindicta-platform](https://github.com/vindicta-platform/vindicta-platform) repository.
-
+# WarScribe System
 
 Unified system for Warhammer 40k action notation, parsing, and game state reconstruction.
 
