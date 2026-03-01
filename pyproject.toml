@@ -23,9 +23,6 @@ dev = [
 [tool.setuptools.packages.find]
 where = ["src"]
 
-[tool.uv.sources]
-vindicta-foundation = { workspace = true }
-
 [tool.mypy]
 strict = true
 python_version = "3.12"

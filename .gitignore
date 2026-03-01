@@ -56,3 +56,4 @@ assets/javascripts/
 js/bootstrap
 .vscode/
 .idea/
+uv.lock
