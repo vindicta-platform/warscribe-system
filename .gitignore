@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 __pycache__/
 *.pyc
 .DS_Store
@@ -56,3 +57,6 @@ assets/javascripts/
 js/bootstrap
 .vscode/
 .idea/
+=======
+uv.lock
+>>>>>>> Stashed changes
