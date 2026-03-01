@@ -23,12 +23,6 @@ dev = [
 [tool.setuptools.packages.find]
 where = ["src"]
 
-<<<<<<< Updated upstream
-[tool.uv.sources]
-vindicta-foundation = { workspace = true }
-
-=======
->>>>>>> Stashed changes
 [tool.mypy]
 strict = true
 python_version = "3.12"
