@@ -1,0 +1,13 @@
+name: Dependency Update
+
+on:
+  schedule:
+    - cron: '0 4 * * 1'
+  workflow_dispatch:
+
+jobs:
+  update:
+    uses: vindicta-platform/.github/.github/workflows/dependency-update-template.yml@main
+    permissions:
+      contents: write
+      pull-requests: write

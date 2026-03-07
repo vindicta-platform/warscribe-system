@@ -1,0 +1,14 @@
+name: License Header Check
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'src/**/*.py'
+  workflow_dispatch:
+
+jobs:
+  check:
+    uses: vindicta-platform/.github/.github/workflows/license-header-template.yml@main
+    permissions:
+      contents: read
