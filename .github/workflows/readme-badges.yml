@@ -1,0 +1,12 @@
+name: README Badges
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  badges:
+    uses: vindicta-platform/.github/.github/workflows/readme-badges-template.yml@main
+    permissions:
+      contents: write
