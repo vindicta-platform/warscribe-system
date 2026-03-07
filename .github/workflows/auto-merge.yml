@@ -1,0 +1,12 @@
+name: Auto-Merge PR
+
+on:
+  pull_request:
+    types: [opened, ready_for_review, reopened]
+
+jobs:
+  auto-merge:
+    uses: vindicta-platform/.github/.github/workflows/auto-merge-template.yml@main
+    permissions:
+      pull-requests: write
+      contents: write

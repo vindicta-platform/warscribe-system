@@ -1,0 +1,13 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    uses: vindicta-platform/.github/.github/workflows/release-python-template.yml@main
+    permissions:
+      contents: write
+      packages: write
