@@ -1,0 +1,15 @@
+name: Docs Build
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'docs/**'
+      - 'mkdocs.yml'
+  workflow_dispatch:
+
+jobs:
+  verify:
+    uses: vindicta-platform/.github/.github/workflows/docs-build-template.yml@main
+    permissions:
+      contents: read
