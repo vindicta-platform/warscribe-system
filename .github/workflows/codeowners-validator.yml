@@ -1,0 +1,15 @@
+name: CODEOWNERS Validator
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'CODEOWNERS'
+      - '.github/CODEOWNERS'
+  workflow_dispatch:
+
+jobs:
+  validate:
+    uses: vindicta-platform/.github/.github/workflows/codeowners-validator-template.yml@main
+    permissions:
+      contents: read

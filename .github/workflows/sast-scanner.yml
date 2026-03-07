@@ -1,0 +1,18 @@
+name: SAST Scanner
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'src/**/*.py'
+  push:
+    branches: [main]
+    paths:
+      - 'src/**/*.py'
+  workflow_dispatch:
+
+jobs:
+  scan:
+    uses: vindicta-platform/.github/.github/workflows/sast-scanner-template.yml@main
+    permissions:
+      contents: read

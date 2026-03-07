@@ -1,0 +1,13 @@
+name: Publish Gate
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  gate:
+    uses: vindicta-platform/.github/.github/workflows/publish-gate-template.yml@main
+    permissions:
+      contents: read
