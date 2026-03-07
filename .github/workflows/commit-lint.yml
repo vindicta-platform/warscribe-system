@@ -1,0 +1,11 @@
+name: Commit Lint
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint:
+    uses: vindicta-platform/.github/.github/workflows/commit-lint-template.yml@main
+    permissions:
+      contents: read

@@ -1,0 +1,14 @@
+name: Markdown Lint
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '**/*.md'
+  workflow_dispatch:
+
+jobs:
+  lint:
+    uses: vindicta-platform/.github/.github/workflows/markdown-lint-template.yml@main
+    permissions:
+      contents: read

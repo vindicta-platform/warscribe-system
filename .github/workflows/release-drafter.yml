@@ -1,0 +1,13 @@
+name: Release Drafter
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  draft:
+    uses: vindicta-platform/.github/.github/workflows/release-drafter-template.yml@main
+    permissions:
+      contents: write
+      pull-requests: read
