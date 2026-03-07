@@ -4,6 +4,7 @@ Warscribe API — FastAPI gateway for job submission, status, and RAG queries.
 
 import os
 import sys
+from pathlib import Path
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__)))
 
@@ -18,6 +19,8 @@ from query_engine import QueryEngine
 
 REDIS_URL = os.environ.get("REDIS_URL", "redis://localhost:6379")
 DB_PATH = os.environ.get("DB_PATH", "warscribe.db")
+# Directory where ingestible files are expected to reside
+ALLOWED_INGEST_DIR = Path(os.environ.get("INGEST_DIR", "/data/input")).resolve()
 
 app = FastAPI(title="Warscribe API", version="1.0.0")
 
@@ -48,7 +51,7 @@ class IngestRequest(BaseModel):
     source_id: Optional[str] = None
 
 
-# ── Job Endpoints ──────────────────────────────────────────
+# ── Job Endpoints ────────────────────────────────────────
 
 
 @app.post("/jobs", status_code=201)
@@ -95,17 +98,25 @@ def rag_query(req: QueryRequest):
 @app.post("/ingest")
 def ingest_file(req: IngestRequest):
     """Ingest a text file from the input volume into ChromaDB."""
-    if not os.path.exists(req.file_path):
-        raise HTTPException(status_code=404, detail=f"File not found: {req.file_path}")
+    # Sanitize user-controlled path to prevent path traversal (S6549)
+    safe_path = Path(req.file_path).resolve()
+    if not safe_path.is_relative_to(ALLOWED_INGEST_DIR):
+        raise HTTPException(
+            status_code=400,
+            detail="File path must reside within the allowed ingest directory",
+        )
+
+    if not safe_path.exists():
+        raise HTTPException(status_code=404, detail=f"File not found: {safe_path}")
 
     from ingest_text import ingest_text_file
 
-    source_id = req.source_id or os.path.basename(req.file_path)
-    count = ingest_text_file(req.file_path, source_id=source_id, db_path=DB_PATH)
+    source_id = req.source_id or safe_path.name
+    count = ingest_text_file(str(safe_path), source_id=source_id, db_path=DB_PATH)
     return {"message": f"Ingested {count} chunks", "source_id": source_id}
 
 
-# ── Health ─────────────────────────────────────────────────
+# ── Health ─────────────────────────────────────────────
 
 
 @app.get("/health")
