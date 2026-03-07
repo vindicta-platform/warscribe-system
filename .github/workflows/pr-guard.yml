@@ -1,0 +1,13 @@
+name: PR Quality Guard
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, edited, synchronize, reopened]
+
+jobs:
+  guard:
+    uses: vindicta-platform/.github/.github/workflows/pr-guard-template.yml@main
+    permissions:
+      contents: read
+      pull-requests: write
