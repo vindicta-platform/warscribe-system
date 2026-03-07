@@ -1,0 +1,15 @@
+name: Package Size
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  monitor:
+    uses: vindicta-platform/.github/.github/workflows/package-size-template.yml@main
+    permissions:
+      contents: read
