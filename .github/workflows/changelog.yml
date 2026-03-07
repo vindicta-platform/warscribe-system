@@ -1,0 +1,12 @@
+name: Changelog
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  changelog:
+    uses: vindicta-platform/.github/.github/workflows/changelog-template.yml@main
+    permissions:
+      contents: write
