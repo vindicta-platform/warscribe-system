@@ -1,0 +1,21 @@
+name: Coverage Report
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - '**/*.md'
+      - 'docs/**'
+  pull_request:
+    branches: [main]
+    paths-ignore:
+      - '**/*.md'
+      - 'docs/**'
+  workflow_dispatch:
+
+jobs:
+  coverage:
+    uses: vindicta-platform/.github/.github/workflows/coverage-report-template.yml@main
+    permissions:
+      contents: read
+      pull-requests: write
