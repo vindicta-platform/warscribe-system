@@ -1,0 +1,15 @@
+name: Migration Safety
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '**/migrations/**'
+      - '**/alembic/**'
+  workflow_dispatch:
+
+jobs:
+  check:
+    uses: vindicta-platform/.github/.github/workflows/migration-safety-template.yml@main
+    permissions:
+      contents: read
