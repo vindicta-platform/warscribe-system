@@ -1,0 +1,14 @@
+name: Docstring Coverage
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'src/**/*.py'
+  workflow_dispatch:
+
+jobs:
+  coverage:
+    uses: vindicta-platform/.github/.github/workflows/docstring-coverage-template.yml@main
+    permissions:
+      contents: read
